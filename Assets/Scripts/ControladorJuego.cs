@@ -85,7 +85,7 @@ public class ControladorJuego : MonoBehaviour {
     void ActualizarTextoUI() {
     // Esto actualiza el contador de monedas en pantalla
     if (textoContador != null) {
-        textoContador.text = "Monedas:\n" + monedasRecolectadas;
+        textoContador.text = "Monedas: " + monedasRecolectadas;
     }
 
     // ¡NUEVO! Esto es lo que te faltaba para que cambie el nivel en la pantalla
