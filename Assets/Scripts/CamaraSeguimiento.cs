@@ -2,18 +2,27 @@ using UnityEngine;
 
 public class CamaraSeguimiento : MonoBehaviour {
     public Transform objetivo; // Arrastra aquí al Jugador
-    private float zFija;
+    
+    // Cambiamos la variable de un solo número (float) a un vector 3D para calcular la distancia completa
+    private Vector3 distanciaSeparacion; 
 
     void Start() {
-        // Guardamos la posición inicial en Z de la cámara
-        zFija = transform.position.z;
+        if (objetivo != null) {
+            // Guardamos la distancia exacta original que hay entre la cámara y el jugador al arrancar
+            distanciaSeparacion = transform.position - objetivo.position;
+        }
     }
 
     void LateUpdate() {
         if (objetivo != null) {
-            // Seguimos al jugador en X y mantenemos la Y de la cámara.
-            // La Z se mantiene según el valor inicial guardado.
-            transform.position = new Vector3(objetivo.position.x, transform.position.y, zFija);
+            // 1. Calculamos la posición ideal sumando la posición actual del jugador + la distancia que calculamos en el Start
+            Vector3 posicionDeseada = objetivo.position + distanciaSeparacion;
+            
+            // 2. Conservamos la altura original (Y) fija de la cámara para que no dé saltos extraños
+            posicionDeseada.y = transform.position.y; 
+
+            // 3. Aplicamos el movimiento final (Ahora se moverá en X y avanzará infinitamente en Z)
+            transform.position = posicionDeseada;
         }
     }
 }

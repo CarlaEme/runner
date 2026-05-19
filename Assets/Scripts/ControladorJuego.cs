@@ -7,6 +7,7 @@ public class ControladorJuego : MonoBehaviour {
 
     [Header("Componentes de Interfaz")]
     public TextMeshProUGUI textoContador; 
+    public TextMeshProUGUI textoNivel;
 
     [Header("Progreso del Jugador")]
     public int monedasRecolectadas = 0;
@@ -44,22 +45,30 @@ public class ControladorJuego : MonoBehaviour {
     }
 
     public void SumarMoneda() {
-        monedasRecolectadas++;
-        Debug.Log("Monedas totales en esta partida: " + monedasRecolectadas);
+    monedasRecolectadas++;
+    Debug.Log("Monedas en esta partida: " + monedasRecolectadas);
 
-        // Cada 5 monedas sube un nivel automáticamente
-        if (monedasRecolectadas % monedasParaSubirNivel == 0) {
-            nivelDificultad++;
-            Debug.Log("¡La dificultad ha subido! Nivel actual: " + nivelDificultad);
-        }
+    // LÓGICA DIRECTA: Si las monedas de esta partida llegan al límite configurado (ej. 5 o 50)
+    // y todavía estás en el nivel 1, te sube obligatoriamente al nivel 2.
+    if (monedasRecolectadas >= monedasParaSubirNivel && nivelDificultad == 1) {
+        nivelDificultad = 2;
+        Debug.Log("¡Subiste a Nivel 2!");
+    } 
+    // Si quieres dejar listo el Nivel 3 para cuando llegue al doble de monedas:
+    else if (monedasRecolectadas >= (monedasParaSubirNivel * 2) && nivelDificultad == 2) {
+        nivelDificultad = 3;
+        Debug.Log("¡Subiste a Nivel 3!");
+    }
 
-        ActualizarDificultad();
-        ActualizarTextoUI(); 
+    ActualizarDificultad();
+    ActualizarTextoUI(); 
 
-        if (monedasRecolectadas > maximaPuntuacion) {
-            maximaPuntuacion = monedasRecolectadas;
-            GuardarProgreso();
-        }
+    if (monedasRecolectadas > maximaPuntuacion) {
+        maximaPuntuacion = monedasRecolectadas;
+        GuardarProgreso();
+    }
+
+
     }
 
     void ActualizarDificultad() {
@@ -72,11 +81,19 @@ public class ControladorJuego : MonoBehaviour {
         }
     } // Llave de cierre corregida aquí
 
+   
     void ActualizarTextoUI() {
-        if (textoContador != null) {
-            textoContador.text = "Monedas: " + monedasRecolectadas;
-        }
+    // Esto actualiza el contador de monedas en pantalla
+    if (textoContador != null) {
+        textoContador.text = "Monedas:\n" + monedasRecolectadas;
     }
+
+    // ¡NUEVO! Esto es lo que te faltaba para que cambie el nivel en la pantalla
+    if (textoNivel != null) {
+        textoNivel.text = "Nivel: " + nivelDificultad;
+    }
+}
+
 
     public void GuardarProgreso() {
         PlayerPrefs.SetInt("RecordMonedas", maximaPuntuacion);
