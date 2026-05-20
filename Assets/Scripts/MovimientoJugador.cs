@@ -16,6 +16,42 @@ public class MovimientoJugador : MonoBehaviour {
     void Start() {
         controller = GetComponent<CharacterController>();
         vidasActuales = vidasMaximas;
+    
+        if (PlayerPrefs.HasKey("ColorJugadorPersonalizado")) {
+            string codigoColor = PlayerPrefs.GetString("ColorJugadorPersonalizado");
+            
+            if (ColorUtility.TryParseHtmlString(codigoColor, out Color colorGuardado)) {
+                Renderer renderizador = GetComponent<Renderer>();
+                if (renderizador == null) renderizador = GetComponentInChildren<Renderer>();
+
+                if (renderizador != null) {
+                    Material mat = renderizador.material;
+
+                    // 1. Pintamos el fondo base por si las dudas
+                    mat.color = colorGuardado;
+                    if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", colorGuardado);
+
+                    // 2. EL CAMBIO HISTÓRICO: Forzamos la propiedad de emisión del Shader URP Lit
+                    if (mat.HasProperty("_EmissionColor")) {
+                        // Activamos la casilla de emisión en el motor gráfico
+                        mat.EnableKeyword("_EMISSION"); 
+                        
+                        // Le inyectamos el color verde o naranja directamente al brillo HDR
+                        mat.SetColor("_EmissionColor", colorGuardado);
+                    }
+
+                    // Forzar a Unity a actualizar los gráficos de la escena de inmediato
+                    DynamicGI.SetEmissive(renderizador, colorGuardado);
+
+                    Debug.Log("<color=green>¡Emisión URP doblegada!</color> Aplicado: " + codigoColor);
+                } else {
+                    Debug.LogError("No se encontró Renderer en el Jugador.");
+                }
+            }
+        
+    
+    }
+    
     }
 
     void Update() {

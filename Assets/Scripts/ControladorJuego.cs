@@ -9,6 +9,10 @@ public class ControladorJuego : MonoBehaviour {
     public TextMeshProUGUI textoContador; 
     public TextMeshProUGUI textoNivel;
 
+    [Header("Configuración Visual Dinámica")]
+    public Camera camaraPrincipal;       // Arrastra aquí la Main Camera
+    public GameObject objetoJugador;     // Arrastra aquí a tu Jugador
+
     [Header("Progreso del Jugador")]
     public int monedasRecolectadas = 0;
     public int nivelDificultad = 1;
@@ -36,64 +40,74 @@ public class ControladorJuego : MonoBehaviour {
 
         if (jugador != null) {
             scriptMovimiento = jugador.GetComponent<MovimientoJugador>();
+            objetoJugador = jugador; // Aseguramos la referencia física
         }
 
-        // 2. Ahora que ya tenemos al jugador referenciado, cargamos y aplicamos todo lo demás
+        // 2. Cargamos el progreso guardado
         CargarProgreso();
-        ActualizarDificultad(); // Ahora sí aplicará la velocidad correctamente sin fallar
+        ActualizarDificultad(); 
         ActualizarTextoUI(); 
+
+        // Iniciamos la corrutina de espera de forma correcta
+        StartCoroutine(AplicarColorConRetraso());
+    }
+
+    // Corrutina movida FUERA de Start() para que funcione legalmente en C#
+    System.Collections.IEnumerator AplicarColorConRetraso() {
+        // Espera 2 frames completos a que todo el entorno 3D se estabilice
+        yield return null;
+        yield return null;
+        
+        // 3. Aplicamos el color de los circuitos que el jugador eligió en el menú principal
+        CargarColorElegido();
     }
 
     public void SumarMoneda() {
-    monedasRecolectadas++;
-    Debug.Log("Monedas en esta partida: " + monedasRecolectadas);
+        monedasRecolectadas++;
+        Debug.Log("Monedas en esta partida: " + monedasRecolectadas);
 
-    // LÓGICA DIRECTA: Si las monedas de esta partida llegan al límite configurado (ej. 5 o 50)
-    // y todavía estás en el nivel 1, te sube obligatoriamente al nivel 2.
-    if (monedasRecolectadas >= monedasParaSubirNivel && nivelDificultad == 1) {
-        nivelDificultad = 2;
-        Debug.Log("¡Subiste a Nivel 2!");
-    } 
-    // Si quieres dejar listo el Nivel 3 para cuando llegue al doble de monedas:
-    else if (monedasRecolectadas >= (monedasParaSubirNivel * 2) && nivelDificultad == 2) {
-        nivelDificultad = 3;
-        Debug.Log("¡Subiste a Nivel 3!");
-    }
+        // Lógica de niveles infinitos con cambio de iluminación cromática automática
+        if (monedasRecolectadas % monedasParaSubirNivel == 0) {
+            nivelDificultad++;
+            Debug.Log("¡Subiste al Nivel " + nivelDificultad + "!");
 
-    ActualizarDificultad();
-    ActualizarTextoUI(); 
+            // Generamos tono de fondo dinámico (HSV)
+            float tonoFondo = (nivelDificultad * 0.15f) % 1f;
+            Color nuevoColorFondo = Color.HSVToRGB(tonoFondo, 0.6f, 0.3f); 
+            CambiarColorDefondo(nuevoColorFondo);
 
-    if (monedasRecolectadas > maximaPuntuacion) {
-        maximaPuntuacion = monedasRecolectadas;
-        GuardarProgreso();
-    }
+            // Generamos tono de jugador contrastante de forma automática durante la carrera
+            float tonoJugador = (tonoFondo + 0.5f) % 1f; 
+            Color nuevoColorJugador = Color.HSVToRGB(tonoJugador, 0.8f, 0.9f); 
+            CambiarColorDelJugador(nuevoColorJugador);
+        }
 
+        ActualizarDificultad();
+        ActualizarTextoUI(); 
 
-    }
-
+        if (monedasRecolectadas > maximaPuntuacion) {
+            maximaPuntuacion = monedasRecolectadas;
+            GuardarProgreso();
+        }
+    } // Aquí se cerraba la clase por error, corregido.
+    
     void ActualizarDificultad() {
         if (scriptMovimiento != null) {
-            // El jugador también se vuelve un poco más rápido con cada moneda para poder huir mejor
             float nuevaVelocidad = velocidadBaseJugador + (monedasRecolectadas * incrementoVelocidadPorMoneda);
             scriptMovimiento.Velocidad = nuevaVelocidad; 
-            
             Debug.Log("Nueva velocidad del jugador: " + nuevaVelocidad);
         }
-    } // Llave de cierre corregida aquí
+    }
 
-   
     void ActualizarTextoUI() {
-    // Esto actualiza el contador de monedas en pantalla
-    if (textoContador != null) {
-        textoContador.text = "Monedas: " + monedasRecolectadas;
-    }
+        if (textoContador != null) {
+            textoContador.text = "Monedas: " + monedasRecolectadas;
+        }
 
-    // ¡NUEVO! Esto es lo que te faltaba para que cambie el nivel en la pantalla
-    if (textoNivel != null) {
-        textoNivel.text = "Nivel: " + nivelDificultad;
+        if (textoNivel != null) {
+            textoNivel.text = "Nivel: " + nivelDificultad;
+        }
     }
-}
-
 
     public void GuardarProgreso() {
         PlayerPrefs.SetInt("RecordMonedas", maximaPuntuacion);
@@ -104,6 +118,50 @@ public class ControladorJuego : MonoBehaviour {
     public void CargarProgreso() {
         maximaPuntuacion = PlayerPrefs.GetInt("RecordMonedas", 0);
         Debug.Log("Puntuación máxima cargada: " + maximaPuntuacion);
+    }
+
+    // ==========================================================
+    // SISTEMA DE PERSONALIZACIÓN Y MEMORIA DE COLORES (MENÚ)
+    // ==========================================================
+
+    public void GuardarColorElegido(Color colorElegido) {
+        string codigoColor = "#" + ColorUtility.ToHtmlStringRGBA(colorElegido);
+        PlayerPrefs.SetString("ColorJugadorPersonalizado", codigoColor);
+        PlayerPrefs.Save();
+        CambiarColorDelJugador(colorElegido); // Cambia el color visual de inmediato en el menú
+    }
+
+    public void CargarColorElegido() {
+        if (PlayerPrefs.HasKey("ColorJugadorPersonalizado")) {
+            string codigoColor = PlayerPrefs.GetString("ColorJugadorPersonalizado");
+            if (ColorUtility.TryParseHtmlString(codigoColor, out Color colorGuardado)) {
+                CambiarColorDelJugador(colorGuardado);
+            }
+        }
+    }
+
+    public void CambiarColorDefondo(Color nuevoColor) {
+        if (camaraPrincipal != null) {
+            camaraPrincipal.clearFlags = CameraClearFlags.SolidColor;
+            camaraPrincipal.backgroundColor = nuevoColor;
+        }
+    }
+
+    public void CambiarColorDelJugador(Color nuevoColor) {
+        if (objetoJugador != null) {
+            Renderer renderizador = objetoJugador.GetComponent<Renderer>();
+            if (renderizador == null) {
+                renderizador = objetoJugador.GetComponentInChildren<Renderer>();
+            }
+
+            if (renderizador != null) {
+                // Cambia el color clásico y el tinte de materiales con texturas URP (_BaseColor)
+                renderizador.material.color = nuevoColor;
+                if (renderizador.material.HasProperty("_BaseColor")) {
+                    renderizador.material.SetColor("_BaseColor", nuevoColor);
+                }
+            }
+        }
     }
 
     [ContextMenu("Borrar Datos Guardados")]
