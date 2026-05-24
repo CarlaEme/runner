@@ -8,6 +8,8 @@ public class ControladorJuego : MonoBehaviour {
     [Header("Componentes de Interfaz")]
     public TextMeshProUGUI textoContador; 
     public TextMeshProUGUI textoNivel;
+    // 🌟 NUEVO: Arrastra aquí tu nuevo componente de texto para el Récord
+    public TextMeshProUGUI textoRecord; 
 
     [Header("Configuración Visual Dinámica")]
     public Camera camaraPrincipal;       // Arrastra aquí la Main Camera
@@ -17,6 +19,11 @@ public class ControladorJuego : MonoBehaviour {
     public int monedasRecolectadas = 0;
     public int nivelDificultad = 1;
     public int maximaPuntuacion = 0;
+    public GameObject accesorioVisual; 
+    public int monedasParaDesbloquearAccesorio = 15;
+    // --- NUEVO: Segundo Accesorio (Ej. Alas o Lentes) ---
+    public GameObject segundoAccesorioVisual; 
+    public int monedasParaSegundoAccesorio = 30; // Meta más alta (ej. 30 monedas)
 
     [Header("Ajustes de Dificultad Progresiva")]
     public float velocidadBaseJugador = 6f;
@@ -43,7 +50,7 @@ public class ControladorJuego : MonoBehaviour {
             objetoJugador = jugador; // Aseguramos la referencia física
         }
 
-        // 2. Cargamos el progreso guardado
+        // 2. Cargamos el progreso guardado (Récord y monedas acumuladas en el intento)
         CargarProgreso();
         ActualizarDificultad(); 
         ActualizarTextoUI(); 
@@ -52,7 +59,6 @@ public class ControladorJuego : MonoBehaviour {
         StartCoroutine(AplicarColorConRetraso());
     }
 
-    // Corrutina movida FUERA de Start() para que funcione legalmente en C#
     System.Collections.IEnumerator AplicarColorConRetraso() {
         // Espera 2 frames completos a que todo el entorno 3D se estabilice
         yield return null;
@@ -66,10 +72,38 @@ public class ControladorJuego : MonoBehaviour {
         monedasRecolectadas++;
         Debug.Log("Monedas en esta partida: " + monedasRecolectadas);
 
+        // Guardado inmediato de las monedas acumuladas en la memoria del dispositivo
+        PlayerPrefs.SetInt("MonedasActualesGuardadas", monedasRecolectadas);
+        PlayerPrefs.SetInt("NivelActualGuardado", nivelDificultad);
+        PlayerPrefs.Save();
+
+        // --- GESTIÓN DE ACCESORIOS POR NIVELES ---
+        if (monedasRecolectadas >= monedasParaDesbloquearAccesorio && monedasRecolectadas < monedasParaSegundoAccesorio) {
+            if (accesorioVisual != null && !accesorioVisual.activeSelf) { 
+                accesorioVisual.SetActive(true); // ¡Enciende el sombrero!
+                Debug.Log("<color=green>¡Primer accesorio equipado!</color>");
+            }
+            if (segundoAccesorioVisual != null && segundoAccesorioVisual.activeSelf) {
+                segundoAccesorioVisual.SetActive(false); 
+            }
+        }
+        else if (monedasRecolectadas >= monedasParaSegundoAccesorio) {
+            if (accesorioVisual != null && accesorioVisual.activeSelf) {
+                accesorioVisual.SetActive(false); // ¡Apaga el sombrero!
+            }
+            if (segundoAccesorioVisual != null && !segundoAccesorioVisual.activeSelf) {
+                segundoAccesorioVisual.SetActive(true); // ¡Enciende la corona!
+                Debug.Log("<color=cyan>¡Cambio de look! Sombrero guardado y corona equipada.</color>");
+            }
+        }
+
         // Lógica de niveles infinitos con cambio de iluminación cromática automática
         if (monedasRecolectadas % monedasParaSubirNivel == 0) {
             nivelDificultad++;
             Debug.Log("¡Subiste al Nivel " + nivelDificultad + "!");
+
+            PlayerPrefs.SetInt("NivelActualGuardado", nivelDificultad);
+            PlayerPrefs.Save();
 
             // Generamos tono de fondo dinámico (HSV)
             float tonoFondo = (nivelDificultad * 0.15f) % 1f;
@@ -82,14 +116,15 @@ public class ControladorJuego : MonoBehaviour {
             CambiarColorDelJugador(nuevoColorJugador);
         }
 
-        ActualizarDificultad();
-        ActualizarTextoUI(); 
-
+        // 🌟 Control del récord histórico en tiempo real
         if (monedasRecolectadas > maximaPuntuacion) {
             maximaPuntuacion = monedasRecolectadas;
             GuardarProgreso();
         }
-    } // Aquí se cerraba la clase por error, corregido.
+
+        ActualizarDificultad();
+        ActualizarTextoUI(); 
+    } 
     
     void ActualizarDificultad() {
         if (scriptMovimiento != null) {
@@ -107,6 +142,11 @@ public class ControladorJuego : MonoBehaviour {
         if (textoNivel != null) {
             textoNivel.text = "Nivel: " + nivelDificultad;
         }
+
+        // 🌟 NUEVO: Muestra el récord actual en la pantalla
+        if (textoRecord != null) {
+            textoRecord.text = "Récord Máximo: " + maximaPuntuacion;
+        }
     }
 
     public void GuardarProgreso() {
@@ -117,18 +157,17 @@ public class ControladorJuego : MonoBehaviour {
 
     public void CargarProgreso() {
         maximaPuntuacion = PlayerPrefs.GetInt("RecordMonedas", 0);
-        Debug.Log("Puntuación máxima cargada: " + maximaPuntuacion);
+        monedasRecolectadas = PlayerPrefs.GetInt("MonedasActualesGuardadas", 0);
+        nivelDificultad = PlayerPrefs.GetInt("NivelActualGuardado", 1);
+        
+        Debug.Log("Puntuación máxima cargada: " + maximaPuntuacion + " | Monedas retenidas: " + monedasRecolectadas);
     }
-
-    // ==========================================================
-    // SISTEMA DE PERSONALIZACIÓN Y MEMORIA DE COLORES (MENÚ)
-    // ==========================================================
 
     public void GuardarColorElegido(Color colorElegido) {
         string codigoColor = "#" + ColorUtility.ToHtmlStringRGBA(colorElegido);
         PlayerPrefs.SetString("ColorJugadorPersonalizado", codigoColor);
         PlayerPrefs.Save();
-        CambiarColorDelJugador(colorElegido); // Cambia el color visual de inmediato en el menú
+        CambiarColorDelJugador(colorElegido); 
     }
 
     public void CargarColorElegido() {
@@ -155,7 +194,6 @@ public class ControladorJuego : MonoBehaviour {
             }
 
             if (renderizador != null) {
-                // Cambia el color clásico y el tinte de materiales con texturas URP (_BaseColor)
                 renderizador.material.color = nuevoColor;
                 if (renderizador.material.HasProperty("_BaseColor")) {
                     renderizador.material.SetColor("_BaseColor", nuevoColor);
@@ -168,6 +206,14 @@ public class ControladorJuego : MonoBehaviour {
     public void BorrarDatos() {
         PlayerPrefs.DeleteAll();
         maximaPuntuacion = 0;
+        monedasRecolectadas = 0;
+        nivelDificultad = 1;
+        if (accesorioVisual != null) accesorioVisual.SetActive(false);
+        if (segundoAccesorioVisual != null) segundoAccesorioVisual.SetActive(false); 
+
+        // 🌟 Actualiza la interfaz inmediatamente al borrar
+        ActualizarTextoUI();
+
         Debug.Log("Datos eliminados correctamente.");
     }
 }

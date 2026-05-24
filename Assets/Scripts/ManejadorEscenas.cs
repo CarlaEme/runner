@@ -30,11 +30,23 @@ public class ManejadorEscenas : MonoBehaviour {
         SceneManager.LoadScene("MenuPrincipal"); // Regresa al inicio
     }
 
-    public void ReiniciarCarreraActual() {
-        Time.timeScale = 1f;
-        // Recarga la misma escena en la que estás corriendo (resetea monedas y nivel a 1)
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
+public void ReiniciarCarreraActual()
+{
+    // 1. Vaciamos las monedas acumuladas del intento y reiniciamos el nivel de suelo al 1
+    PlayerPrefs.SetInt("MonedasActualesGuardadas", 0);
+    PlayerPrefs.SetInt("NivelActualGuardado", 1);
+    PlayerPrefs.Save();
+
+    // 2. Aseguramos que el juego se descongele si estaba en pausa
+    Time.timeScale = 1f;
+
+    // 3. Cargamos la escena limpia (lo que ya hacía tu script)
+    UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+}
+
+
+
+    
 
     public void SalirDelVideojuego() {
         Debug.Log("Cerrando el juego de forma segura...");
