@@ -479,7 +479,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -562,8 +562,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 200, y: 220}
+  m_AnchoredPosition: {x: 0, y: -100}
+  m_SizeDelta: {x: 150, y: 240}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &441695876
 MonoBehaviour:
@@ -783,8 +783,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.53971606, g: 0.9009434, b: 0.9009434, a: 1}
-  m_RaycastTarget: 1
+  m_Color: {r: 0, g: 0.740566, b: 0.740566, a: 1}
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -900,8 +900,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4287080954
-  m_fontColor: {r: 0.98039216, g: 0.6633447, b: 0.5294118, a: 1}
+    rgba: 4288252023
+  m_fontColor: {r: 0.4666667, g: 0.5333334, b: 0.6, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1152,8 +1152,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -11.988892, y: 45.853943}
-  m_SizeDelta: {x: 600, y: 600}
+  m_AnchoredPosition: {x: -11.988892, y: 0}
+  m_SizeDelta: {x: 700, y: 600}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &714800001
 MonoBehaviour:
@@ -1202,8 +1202,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 120
-  m_fontSizeBase: 120
+  m_fontSize: 140
+  m_fontSizeBase: 140
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1544,7 +1544,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+    m_NormalColor: {r: 0.2306871, g: 0.3820755, b: 0.27799597, a: 1}
     m_HighlightedColor: {r: 0.10131219, g: 0.2735849, b: 0.03613386, a: 1}
     m_PressedColor: {r: 0.4734488, g: 0.7028302, b: 0.3414694, a: 1}
     m_SelectedColor: {r: 0.62158614, g: 0.8443396, b: 0.56953096, a: 1}
@@ -1827,7 +1827,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 2100000, guid: 14855ab440dce044eb6ee9abace90855, type: 2}
   m_Color: {r: 0, g: 0, b: 0, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1924,11 +1924,11 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.10588236, g: 0.10588236, b: 0.10588236, a: 1}
+    m_NormalColor: {r: 0.5450981, g: 0, b: 0, a: 1}
     m_HighlightedColor: {r: 0.3584906, g: 0.050729793, b: 0.06930152, a: 1}
-    m_PressedColor: {r: 0.5707547, g: 0.045768075, b: 0.045768075, a: 1}
+    m_PressedColor: {r: 0.2783019, g: 0.02756764, b: 0.02756764, a: 1}
     m_SelectedColor: {r: 0.6039216, g: 0, b: 0, a: 0.8745098}
-    m_DisabledColor: {r: 0.5754717, g: 0, b: 0, a: 0.77254903}
+    m_DisabledColor: {r: 0.41037738, g: 0.067750975, b: 0.067750975, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:
@@ -2075,8 +2075,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4285986661
-  m_fontColor: {r: 0.3968272, g: 0.9669811, b: 0.46445552, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2236,7 +2236,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -2614,6 +2614,7 @@ GameObject:
   - component: {fileID: 1464160928}
   - component: {fileID: 1464160927}
   - component: {fileID: 1464160926}
+  - component: {fileID: 1464160930}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -2655,7 +2656,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -2707,6 +2708,25 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1464160930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464160925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afe3cda3e244f60419474164d6ba3b0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.UI.TrackedDeviceRaycaster
+  m_IgnoreReversedGraphics: 0
+  m_CheckFor2DOcclusion: 0
+  m_CheckFor3DOcclusion: 0
+  m_MaxDistance: 1000
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &1579919611
 GameObject:
   m_ObjectHideFlags: 0
@@ -2797,7 +2817,7 @@ MonoBehaviour:
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
+  m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
@@ -2917,11 +2937,11 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.10849059, g: 0.10234961, b: 0.10234961, a: 1}
-    m_HighlightedColor: {r: 0, g: 0.2954704, b: 0.3490566, a: 1}
-    m_PressedColor: {r: 0, g: 0.8301887, b: 0.79603803, a: 1}
-    m_SelectedColor: {r: 0.7176471, g: 1, b: 0.9622538, a: 1}
-    m_DisabledColor: {r: 0, g: 0.98460245, b: 1, a: 0.5019608}
+    m_NormalColor: {r: 0.282353, g: 0.2392157, b: 0.5450981, a: 1}
+    m_HighlightedColor: {r: 0.21877854, g: 0.13481219, b: 0.3915094, a: 1}
+    m_PressedColor: {r: 0.27635828, g: 0.13461198, b: 0.5707547, a: 1}
+    m_SelectedColor: {r: 0.31831664, g: 0.14896317, b: 0.48584908, a: 1}
+    m_DisabledColor: {r: 0.33297357, g: 0.12210752, b: 0.5283019, a: 1}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
   m_SpriteState:

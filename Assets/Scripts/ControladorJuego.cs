@@ -8,7 +8,6 @@ public class ControladorJuego : MonoBehaviour {
     [Header("Componentes de Interfaz")]
     public TextMeshProUGUI textoContador; 
     public TextMeshProUGUI textoNivel;
-    // 🌟 NUEVO: Arrastra aquí tu nuevo componente de texto para el Récord
     public TextMeshProUGUI textoRecord; 
 
     [Header("Configuración Visual Dinámica")]
@@ -19,11 +18,12 @@ public class ControladorJuego : MonoBehaviour {
     public int monedasRecolectadas = 0;
     public int nivelDificultad = 1;
     public int maximaPuntuacion = 0;
-    public GameObject accesorioVisual; 
-    public int monedasParaDesbloquearAccesorio = 15;
-    // --- NUEVO: Segundo Accesorio (Ej. Alas o Lentes) ---
-    public GameObject segundoAccesorioVisual; 
-    public int monedasParaSegundoAccesorio = 30; // Meta más alta (ej. 30 monedas)
+
+    [Header("Sistema Ciclo de Accesorios Infinito")]
+    public GameObject accesorioVisual;         // Tu Primer Accesorio (Ej. Sombrero)
+    public GameObject segundoAccesorioVisual;  // Tu Segundo Accesorio (Ej. Corona)
+    [Tooltip("Cada cuántas monedas cambia el estado del accesorio (Ej. Cada 10 monedas)")]
+    public int monedasPorCambio = 10; 
 
     [Header("Ajustes de Dificultad Progresiva")]
     public float velocidadBaseJugador = 6f;
@@ -54,6 +54,7 @@ public class ControladorJuego : MonoBehaviour {
         CargarProgreso();
         ActualizarDificultad(); 
         ActualizarTextoUI(); 
+        GestionarCicloAccesorios(); // Actualiza el aspecto inicial según las monedas cargadas
 
         // Iniciamos la corrutina de espera de forma correcta
         StartCoroutine(AplicarColorConRetraso());
@@ -77,25 +78,8 @@ public class ControladorJuego : MonoBehaviour {
         PlayerPrefs.SetInt("NivelActualGuardado", nivelDificultad);
         PlayerPrefs.Save();
 
-        // --- GESTIÓN DE ACCESORIOS POR NIVELES ---
-        if (monedasRecolectadas >= monedasParaDesbloquearAccesorio && monedasRecolectadas < monedasParaSegundoAccesorio) {
-            if (accesorioVisual != null && !accesorioVisual.activeSelf) { 
-                accesorioVisual.SetActive(true); // ¡Enciende el sombrero!
-                Debug.Log("<color=green>¡Primer accesorio equipado!</color>");
-            }
-            if (segundoAccesorioVisual != null && segundoAccesorioVisual.activeSelf) {
-                segundoAccesorioVisual.SetActive(false); 
-            }
-        }
-        else if (monedasRecolectadas >= monedasParaSegundoAccesorio) {
-            if (accesorioVisual != null && accesorioVisual.activeSelf) {
-                accesorioVisual.SetActive(false); // ¡Apaga el sombrero!
-            }
-            if (segundoAccesorioVisual != null && !segundoAccesorioVisual.activeSelf) {
-                segundoAccesorioVisual.SetActive(true); // ¡Enciende la corona!
-                Debug.Log("<color=cyan>¡Cambio de look! Sombrero guardado y corona equipada.</color>");
-            }
-        }
+        // --- 🔄 NUEVA GESTIÓN CÍCLICA DE ACCESORIOS ---
+        GestionarCicloAccesorios();
 
         // Lógica de niveles infinitos con cambio de iluminación cromática automática
         if (monedasRecolectadas % monedasParaSubirNivel == 0) {
@@ -125,6 +109,41 @@ public class ControladorJuego : MonoBehaviour {
         ActualizarDificultad();
         ActualizarTextoUI(); 
     } 
+
+    // Métodocentralizado para calcular matemáticamente qué accesorio toca
+    private void GestionarCicloAccesorios() {
+        if (monedasPorCambio <= 0) monedasPorCambio = 10; // Evita división por cero por seguridad
+
+        // Calculamos el estado del bucle (0, 1, 2 o 3) usando el operador de residuo
+        int estadoActual = (monedasRecolectadas / monedasPorCambio) % 4;
+
+        switch (estadoActual)
+        {
+            case 0:
+                // ESTADO 0: Sin nada en la cabeza (Inicio de la tanda de monedas)
+                if (accesorioVisual != null) accesorioVisual.SetActive(false);
+                if (segundoAccesorioVisual != null) segundoAccesorioVisual.SetActive(false);
+                break;
+
+            case 1:
+                // ESTADO 1: Se activa el Primer Accesorio (Sombrero)
+                if (accesorioVisual != null) accesorioVisual.SetActive(true);
+                if (segundoAccesorioVisual != null) segundoAccesorioVisual.SetActive(false);
+                break;
+
+            case 2:
+                // ESTADO 2: Se desactiva el sombrero y se activa el Segundo Accesorio (Corona)
+                if (accesorioVisual != null) accesorioVisual.SetActive(false);
+                if (segundoAccesorioVisual != null) segundoAccesorioVisual.SetActive(true);
+                break;
+
+            case 3:
+                // ESTADO 3: Se quita la corona (Cabeza limpia un momento antes de reiniciar todo el ciclo)
+                if (accesorioVisual != null) accesorioVisual.SetActive(false);
+                if (segundoAccesorioVisual != null) segundoAccesorioVisual.SetActive(false);
+                break;
+        }
+    }
     
     void ActualizarDificultad() {
         if (scriptMovimiento != null) {
@@ -143,7 +162,6 @@ public class ControladorJuego : MonoBehaviour {
             textoNivel.text = "Nivel: " + nivelDificultad;
         }
 
-        // 🌟 NUEVO: Muestra el récord actual en la pantalla
         if (textoRecord != null) {
             textoRecord.text = "Récord Máximo: " + maximaPuntuacion;
         }
@@ -208,10 +226,9 @@ public class ControladorJuego : MonoBehaviour {
         maximaPuntuacion = 0;
         monedasRecolectadas = 0;
         nivelDificultad = 1;
-        if (accesorioVisual != null) accesorioVisual.SetActive(false);
-        if (segundoAccesorioVisual != null) segundoAccesorioVisual.SetActive(false); 
-
-        // 🌟 Actualiza la interfaz inmediatamente al borrar
+        
+        // Reseteamos visuales inmediatamente
+        GestionarCicloAccesorios();
         ActualizarTextoUI();
 
         Debug.Log("Datos eliminados correctamente.");
